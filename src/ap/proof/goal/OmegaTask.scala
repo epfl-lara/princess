@@ -340,11 +340,10 @@ case object OmegaTask extends EagerTask {
                                     lowerBounds : Seq[LinearCombination],
                                     upperBounds : Seq[LinearCombination]) : IdealInt = {
     val m = IdealInt.max(for (lc <- upperBounds.iterator) yield (lc get elimConst).abs)
-    (IdealInt.ONE /: 
-       (for (lc <- lowerBounds.iterator) yield {
+    (for (lc <- lowerBounds.iterator) yield {
           val coeff = (lc get elimConst).abs
           ((m - IdealInt.ONE) * coeff - m) / m + IdealInt.ONE
-        })) (_ + _)
+        }).foldLeft(IdealInt.ONE) (_ + _)
   }
    
   /**

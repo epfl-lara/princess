@@ -41,6 +41,7 @@ import ap.types.{MonoSortedIFunction, SortedIFunction,
 
 import scala.collection.mutable.{HashMap => MHashMap, HashSet => MHashSet,
                                  ArrayBuffer}
+import scala.collection.JavaConverters._
 
 object ApParser2InputAbsy {
 
@@ -100,7 +101,6 @@ class ApParser2InputAbsy(_env : ApParser2InputAbsy.Env,
   
   /** Implicit conversion so that we can get a Scala-like iterator from a
     * a Java list */
-  import scala.collection.JavaConversions.{asScalaBuffer, asScalaIterator}
 
   type GrammarExpression = Expression
 
@@ -137,7 +137,7 @@ class ApParser2InputAbsy(_env : ApParser2InputAbsy.Env,
   
   protected def translateProblem(api : API) : IFormula = api match {
     case api : BlockList => {
-      api.listblock_.filter(_.isInstanceOf[Problem]) match {
+      api.listblock_.asScala.filter(_.isInstanceOf[Problem]) match {
         case Seq(problem : Problem) =>
           asFormula(translateExpression(problem.expression_))
         case _ => throw new Parser2InputAbsy.TranslationException(
@@ -156,8 +156,8 @@ class ApParser2InputAbsy(_env : ApParser2InputAbsy.Env,
             inter = block.asInstanceOf[Interpolant];
             intBlocks = inter.listinterpblockc_;
             n <- 1 until intBlocks.size) yield {
-         val left = intBlocks take n
-         val right = intBlocks drop n
+         val left = intBlocks.asScala take n
+         val right = intBlocks.asScala drop n
          IInterpolantSpec(
            (for (ids <- left; id <- ids.asInstanceOf[InterpBlock].listident_)
               yield (env lookupPartName id)).toList,
@@ -303,7 +303,7 @@ class ApParser2InputAbsy(_env : ApParser2InputAbsy.Env,
                   determineSorts(args.formalargsc_)
               }
 
-              val wrappedOpts = asScalaBuffer(decl.listpredoption_)
+              val wrappedOpts = decl.listpredoption_.asScala
               val (negMatchOpts, otherOpts1) =
                 wrappedOpts partition (_.isInstanceOf[NegMatch])
               val (noMatchOpts, otherOpts2) =
@@ -346,7 +346,7 @@ class ApParser2InputAbsy(_env : ApParser2InputAbsy.Env,
         val resSort = type2Sort(decl.type_)
         val argSorts = determineSorts(decl.formalargsc_)
 
-        val wrappedOpts = asScalaBuffer(decl.listfunoption_)
+        val wrappedOpts = decl.listfunoption_.asScala
         val (partialOpts, otherOpts1) =
           wrappedOpts partition (_.isInstanceOf[Partial])
         val (relationalOpts, otherOpts2) =
@@ -496,7 +496,7 @@ class ApParser2InputAbsy(_env : ApParser2InputAbsy.Env,
               
               // declare arguments
               for (arg <- decl.formalargsc_.asInstanceOf[FormalArgs]
-                              .listargtypec_.reverse)
+                              .listargtypec_.asScala.reverse)
                 arg match {
                   case arg : NamedArgType =>
                     env.pushVar(arg.ident_, type2Sort(arg.type_))
@@ -525,7 +525,7 @@ class ApParser2InputAbsy(_env : ApParser2InputAbsy.Env,
                   // nothing
                 case args : WithFormalArgs =>
                   for (arg <- args.formalargsc_.asInstanceOf[FormalArgs]
-                                  .listargtypec_.reverse)
+                                  .listargtypec_.asScala.reverse)
                     arg match {
                       case arg : NamedArgType =>
                         env.pushVar(arg.ident_, type2Sort(arg.type_))

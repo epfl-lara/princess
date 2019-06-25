@@ -39,8 +39,8 @@ class TestLinearCombination(n : String) extends APTestCase(n) {
 
   private val consts = for (i <- Array.range(0, 20)) yield new ConstantTerm("c" + i)
   private val constsAndOne = consts ++ List(OneTerm)
-  private val to = (TermOrder.EMPTY /: consts)((o, c) => o.extend(c))
-  private val toRev = (consts :\ TermOrder.EMPTY)((c, o) => o.extend(c))
+  private val to = consts.foldLeft(TermOrder.EMPTY)((o, c) => o.extend(c))
+  private val toRev = consts.foldRight(TermOrder.EMPTY)((c, o) => o.extend(c))
 
   private def coeffSum(searched : Term,
                        pairs : Iterable[(IdealInt, Term)]) : IdealInt =

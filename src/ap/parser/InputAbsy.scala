@@ -349,7 +349,7 @@ object IExpression {
    * to index 0. 
    */
   def quan(quans : Seq[Quantifier], f : IFormula) : IFormula =
-    (f /: quans)((f, q) => IQuantified(q, f))
+    quans.foldLeft(f)((f, q) => IQuantified(q, f))
 
   /**
    * Quantify some of the variables occurring in a formula.
@@ -371,7 +371,7 @@ object IExpression {
         VariablePermVisitor(f, IVarShift(shifts, vars.size))
 
       // then add quantifiers
-      (vars :\ shiftedF) ((_, g) => IQuantified(quan, g))
+      vars.foldRight(shiftedF) ((_, g) => IQuantified(quan, g))
     }
   }
 
@@ -410,7 +410,7 @@ object IExpression {
                  yield (c, v(quantifiedConstants.size - i - 1))).toMap
     val fWithSubstitutedConsts = ConstantSubstVisitor(fWithShiftedVars, subst)
 
-    (quantifiedConstants :\ fWithSubstitutedConsts) {
+    quantifiedConstants.foldRight(fWithSubstitutedConsts) {
       case ((Quantifier.ALL, c), f) => (SortedConstantTerm sortOf c) all f
       case ((Quantifier.EX,  c), f) => (SortedConstantTerm sortOf c) ex f
     }

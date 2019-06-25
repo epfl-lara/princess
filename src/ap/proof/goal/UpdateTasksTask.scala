@@ -67,7 +67,7 @@ case object UpdateTasksTask extends EagerTask {
     val newTasks3 =
       elimUnneededDefs(newTasks2, criticalPreds, postProcessors, ptf)
 
-    (postProcessors :\ ptf.updateGoal(newTasks3, goal)) { case (f, t) => f(t) }
+    postProcessors.foldRight(ptf.updateGoal(newTasks3, goal)) { case (f, t) => f(t) }
   }
 
   //////////////////////////////////////////////////////////////////////////////

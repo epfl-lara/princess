@@ -367,7 +367,7 @@ class BetaFormulaTask(_formula : Conjunction, val addToQFClauses : Boolean,
   //////////////////////////////////////////////////////////////////////////////
 
   private def size(eqs : Iterable[LinearCombination]) : Int =
-    (0 /: (for (lc <- eqs.iterator) yield lc.size)) ((s:Int, n:Int) => s+n)
+    (for (lc <- eqs.iterator) yield lc.size).foldLeft(0) ((s:Int, n:Int) => s+n)
 
   private def size(ac : ArithConj) : Int =
     size(ac.positiveEqs) + size(ac.negativeEqs) + size(ac.inEqs)

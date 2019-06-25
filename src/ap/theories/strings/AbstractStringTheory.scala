@@ -281,7 +281,7 @@ abstract class AbstractStringTheory extends StringTheory {
 
     for (t <- order sort assignment.keySet) {
       val str = assignment(t)
-      extraFors += (t === (str :\ epsId)(idFor _))
+      extraFors += (t === str.foldRight(epsId)(idFor _))
     }
 
     extraFors += facts

@@ -23,7 +23,7 @@ package ap;
 
 import ap.parameters.{GlobalSettings, Param}
 
-import scala.collection.JavaConversions
+import scala.collection.JavaConverters._
 
 /**
  * A simple class to simulate commandline calls of Princess from within
@@ -32,7 +32,6 @@ import scala.collection.JavaConversions
 object JavaWrapper {
 
   import DialogUtil.asString
-  import JavaConversions.asScalaBuffer
 
   /**
    * Read inputs through a reader. The format of the problem has to be specified
@@ -83,7 +82,7 @@ object JavaWrapper {
   def read(input : () => java.io.Reader,
            options : java.util.List[String]) : String = {
     val (settings, inputs) =
-      GlobalSettings.fromArguments(options, GlobalSettings.DEFAULT)
+      GlobalSettings.fromArguments(options.asScala, GlobalSettings.DEFAULT)
 
     Console.withErr(if (Param.QUIET(settings))
                       CmdlMain.NullStream

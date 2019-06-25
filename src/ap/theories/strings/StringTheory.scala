@@ -236,7 +236,7 @@ trait StringTheory extends Theory {
    * Convert a string to a term
    */
   implicit def string2Term(str : String) : ITerm =
-    (str :\ IFunApp(str_empty, List())) {
+    str.foldRight(IFunApp(str_empty, List())) {
       case (c, s) => IFunApp(str_cons, List(int2Char(c), s))
     }
 
@@ -275,7 +275,7 @@ trait StringTheory extends Theory {
       (ctxt getDataFor StringTheory.this) match {
         case DecoderData(m) =>
           for (s <- m get d)
-          yield ("" /: s) { case (res, c) => res + c.intValueSafe.toChar }
+          yield s.foldLeft("") { case (res, c) => res + c.intValueSafe.toChar }
       }
   }
 

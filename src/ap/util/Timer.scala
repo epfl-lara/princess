@@ -126,11 +126,11 @@ object Timer {
     }) mkString "\n"
     
     val totalTime =
-      if (timerDisabled) 0l else (0l /: accumulatedTimes.valuesIterator)(_ + _)
+      if (timerDisabled) 0l else accumulatedTimes.valuesIterator.foldLeft(0l)(_ + _)
     val totalTimeInMS =
       totalTime.toDouble / 1000000.0
     
-    val totalCalls = (0 /: callCounters.valuesIterator)(_ + _)
+    val totalCalls = callCounters.valuesIterator.foldLeft(0)(_ + _)
     
     val total = "Total: " + totalCalls + ", " + totalTimeInMS + "ms"
     

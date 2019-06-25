@@ -35,7 +35,7 @@ object ComposeSubsts {
     apply(substs.iterator, order)
 
   def apply(substs : Iterator[Substitution], order : TermOrder) : Substitution =
-    (new IdentitySubst (order).asInstanceOf[Substitution] /: substs)(
+    substs.foldLeft(new IdentitySubst (order).asInstanceOf[Substitution])(
       (combination, subst) => apply(combination, subst, order))
   
   def apply(secondSubst : Substitution,

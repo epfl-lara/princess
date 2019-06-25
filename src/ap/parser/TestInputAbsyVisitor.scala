@@ -90,7 +90,7 @@ class TestInputAbsyVisitor(n : String) extends APTestCase(n) {
     val d = new ConstantTerm("d")
     val p = new Predicate("p", 2)
 
-    val to = (TermOrder.EMPTY /: List(c, d))((o, c) => o.extend(c)) extendPred p
+    val to = List(c, d).foldLeft(TermOrder.EMPTY)((o, c) => o.extend(c)) extendPred p
     
     InputAbsy2Internal(p(4, c), to)
     InputAbsy2Internal(ex(p(v(0), d)), to)

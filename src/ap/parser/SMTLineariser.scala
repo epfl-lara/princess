@@ -224,7 +224,7 @@ object SMTLineariser {
       val default =
         resSort.witness getOrElse i(0)
       val body =
-        (default /: points) {
+        points.foldLeft(default) {
           case (ob, (args, result)) => ite(formalArgs === args, result, ob)
         }
       print("  ")

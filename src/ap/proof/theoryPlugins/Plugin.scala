@@ -794,7 +794,7 @@ abstract class PluginTask(plugin : TheoryProcedure) extends Task {
                        branchInferences,
                        goal)
 
-    (actions.iterator :\ newTree) {
+    actions.iterator.foldRight(newTree) {
       case (AddReducableModelElement(f, consts, settings), t) =>
         ptf.eliminatedConstant(t, ReducableModelElement(f, consts, settings),
                                goal.vocabulary)

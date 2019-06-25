@@ -90,7 +90,7 @@ case class BranchInferenceCertificate(inferences : Seq[BranchInference],
                                       order : TermOrder) extends {
 
   private val providedAssumed : (Set[CertFormula], Set[CertFormula]) =
-    ((Set[CertFormula](), Set[CertFormula]()) /: inferences) {
+    inferences.foldLeft((Set[CertFormula](), Set[CertFormula]())) {
       case ((provided, assumed), inf) =>
         (provided ++ inf.providedFormulas,
          assumed ++ (inf.assumedFormulas -- provided))
@@ -100,7 +100,7 @@ case class BranchInferenceCertificate(inferences : Seq[BranchInference],
   val localAssumedFormulas : Set[CertFormula] = providedAssumed _2
 
   val closingConstraint =
-    (inferences :\ _child.closingConstraint)(_ propagateConstraint _)
+    inferences.foldRight(_child.closingConstraint)(_ propagateConstraint _)
   
   override val localBoundConstants : Set[ConstantTerm] =
     Seqs.union(for (inf <- inferences.iterator)
@@ -138,7 +138,7 @@ case class BranchInferenceCertificate(inferences : Seq[BranchInference],
   }
 
   override lazy val constants : Set[ConstantTerm] =
-    (inferences :\ child.constants) {
+    inferences.foldRight(child.constants) {
       case (inf, consts) =>
         (consts ++ inf.constants) -- inf.localBoundConstants
     }

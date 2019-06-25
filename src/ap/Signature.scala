@@ -97,7 +97,7 @@ class Signature private (val universalConstants : Set[ConstantTerm],
                 this.predicateMatchConfig ++ (
                   for (t <- additionalTheories.iterator;
                        p <- t.predicateMatchConfig.iterator) yield p),
-                (this.order /: additionalTheories) { case (o, t) => t extend o },
+                additionalTheories.foldLeft(this.order) { case (o, t) => t extend o },
                 newTheories)
     }
 

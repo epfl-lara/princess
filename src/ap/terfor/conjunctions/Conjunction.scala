@@ -906,7 +906,7 @@ class Conjunction private (val quans : Seq[Quantifier],
     } else if (isFalse) {
       "false"
     } else {
-      val quanPrefix = ("" /: quans)((p, q) => "" + q + " " + p)      
+      val quanPrefix = quans.foldLeft("")((p, q) => "" + q + " " + p)      
       val strings = for (f <- List(arithConj, predConj, negatedConjs); if (!f.isTrue))
                     yield f.toString
       

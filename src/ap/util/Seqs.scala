@@ -117,10 +117,10 @@ object Seqs {
    * Compute a polynomial hashcode for a sequence of things
    */
   def computeHashCode[A](a : Iterator[A], init : Int, multiplier : Int) =
-    (init /: a)((hash, el) => hash * multiplier + el.hashCode)
+    a.foldLeft(init)((hash, el) => hash * multiplier + el.hashCode)
 
   def computeHashCode[A](a : Iterable[A], init : Int, multiplier : Int) =
-    (init /: a)((hash, el) => hash * multiplier + el.hashCode)
+    a.foldLeft(init)((hash, el) => hash * multiplier + el.hashCode)
 
   //////////////////////////////////////////////////////////////////////////////
 
@@ -1272,7 +1272,7 @@ object Seqs {
   /**
    * Prepend some elements in front of a list
    */
-  def prepend[A](els : Iterable[A], l : List[A]) : List[A] = (els :\ l) (_ :: _)
+  def prepend[A](els : Iterable[A], l : List[A]) : List[A] = els.foldRight(l) (_ :: _)
 
   //////////////////////////////////////////////////////////////////////////////
 

@@ -383,7 +383,7 @@ case class Interval(lower : IntervalInt, upper : IntervalInt,
         if (that.containsInt(-1)) this.upper.divfloor(IntervalVal(-1)) else IntervalPosInf,
         if (that.containsInt(1)) this.upper.divfloor(IntervalVal(1)) else IntervalPosInf)
 
-      val xtrm = (xtrms.tail :\ xtrms.head) ((x1, x2) => x1.min(x2))
+      val xtrm = xtrms.tail.foldRight(xtrms.head) ((x1, x2) => x1.min(x2))
 
       // If this Interval contains zero and the minimum is positive, then choose zero
       if (xtrm.isPositive && this.containsInt(0))
@@ -433,7 +433,7 @@ case class Interval(lower : IntervalInt, upper : IntervalInt,
         if (that.containsInt(-1)) this.upper.divceil(IntervalVal(-1)) else IntervalNegInf,
         if (that.containsInt(1)) this.upper.divceil(IntervalVal(1)) else IntervalNegInf)
 
-      val xtrm = (xtrms.tail :\ xtrms.head) ((x1, x2) => x1.max(x2))
+      val xtrm = xtrms.tail.foldRight(xtrms.head) ((x1, x2) => x1.max(x2))
 
       // If this Interval contains zero and the maximum is negative, then choose zero
       if (xtrm.isNegative && this.containsInt(0))
@@ -667,7 +667,7 @@ class IntervalSet(predicates : List[(Polynomial, BitSet)],
         xInterval.lower * yInterval.lower, xInterval.lower * yInterval.upper,
         xInterval.upper * yInterval.lower, xInterval.upper * yInterval.upper)
 
-      val xtrm = (xtrms.tail :\ xtrms.head) ((x1, x2) => x1.min(x2))
+      val xtrm = xtrms.tail.foldRight(xtrms.head) ((x1, x2) => x1.min(x2))
 
       if (xtrm.isPositive &&
           (xInterval.containsInt(0) || yInterval.containsInt(0)))
@@ -749,7 +749,7 @@ class IntervalSet(predicates : List[(Polynomial, BitSet)],
         xInterval.lower * yInterval.lower, xInterval.lower * yInterval.upper,
         xInterval.upper * yInterval.lower, xInterval.upper * yInterval.upper)
 
-      val xtrm = (xtrms.tail :\ xtrms.head) ((x1, x2) => x1.max(x2))
+      val xtrm = xtrms.tail.foldRight(xtrms.head) ((x1, x2) => x1.max(x2))
 
       if (xtrm.isNegative &&
           (xInterval.containsInt(0) || yInterval.containsInt(0)))

@@ -43,7 +43,7 @@ class DotLineariser {
     // first print all assumptions used in the proof
     println("{")
     println("rank=source;")
-    val ctxt = (LineariserContext(0, 1, Map()) /: cert.assumedFormulas) {
+    val ctxt = cert.assumedFormulas.foldLeft(LineariserContext(0, 1, Map())) {
       case (ctxt, f) => (ctxt formulaName f) _2
     }
     println("}")
@@ -152,7 +152,7 @@ class DotLineariser {
   private def printInferenceArcs(from : Set[CertFormula], to : Set[CertFormula],
                                  inf : AnyRef, ctxt : LineariserContext)
                                 : LineariserContext =
-    if (from.size == 1) (ctxt /: to) {
+    if (from.size == 1) to.foldLeft(ctxt) {
       case (ctxt, to) => {
         val (fromName, ctxt2) = ctxt formulaName from.head
         val (toName, ctxt3) = ctxt freshFormulaName to
@@ -163,7 +163,7 @@ class DotLineariser {
       //-BEGIN-ASSERTION-///////////////////////////////////////////////////////
       Debug.assertInt(DotLineariser.AC, to.size == 1)
       //-END-ASSERTION-/////////////////////////////////////////////////////////
-      (ctxt /: from) {
+      from.foldLeft(ctxt) {
         case (ctxt, from) => {
           val (fromName, ctxt2) = ctxt formulaName from
           val (toName, ctxt3) = ctxt formulaName to.head
@@ -194,7 +194,7 @@ class DotLineariser {
   private def dump(cert : Certificate,
                    ctxt : LineariserContext) : Unit = cert match {
     case BranchInferenceCertificate(infs, childCert, _) => {
-      val newFormulaNames = (ctxt /: infs) {
+      val newFormulaNames = infs.foldLeft(ctxt) {
         case (ctxt, inf) =>
           printInferenceArcs(inf.assumedFormulas, inf.providedFormulas,
                              inf, ctxt).increaseRuleAppNum

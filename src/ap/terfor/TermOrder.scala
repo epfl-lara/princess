@@ -447,7 +447,7 @@ class TermOrder private (
         }
         
         newConstantSeq = newConst :: newConstantSeq
-        newConstantSeq = (storedBigConsts :\ newConstantSeq) (_ :: _)
+        newConstantSeq = storedBigConsts.foldRight(newConstantSeq) (_ :: _)
         
         val o = newConstantSeq.size
         new TermOrder(newConstantSeq, predicateSeq,
@@ -493,7 +493,7 @@ class TermOrder private (
                     newConsts forall { c => !(constantWeight contains c) })
     //-END-ASSERTION-///////////////////////////////////////////////////////////
     val o = constantNum.size
-    new TermOrder((constantSeq /: newConsts) { case (l, c) => c :: l },
+    new TermOrder(newConsts.foldLeft(constantSeq) { case (l, c) => c :: l },
                   predicateSeq,
                   constantWeight ++ (
                     for ((c, i) <- newConsts.iterator.zipWithIndex) yield (
@@ -543,9 +543,9 @@ class TermOrder private (
           // drop the moved element
           newConstantSeq = newConstantSeq.tail
         
-          newConstantSeq = (storedBetweenConsts :\ newConstantSeq) (_ :: _)
+          newConstantSeq = storedBetweenConsts.foldRight(newConstantSeq) (_ :: _)
           newConstantSeq = movedConst :: newConstantSeq
-          newConstantSeq = (storedBigConsts :\ newConstantSeq) (_ :: _)
+          newConstantSeq = storedBigConsts.foldRight(newConstantSeq) (_ :: _)
 
           val o = newConstantSeq.size
           new TermOrder(newConstantSeq, predicateSeq,
@@ -578,8 +578,8 @@ class TermOrder private (
           }
 
           newConstantSeq = movedConst :: newConstantSeq
-          newConstantSeq = (storedBetweenConsts :\ newConstantSeq) (_ :: _)
-          newConstantSeq = (storedBigConsts :\ newConstantSeq) (_ :: _)
+          newConstantSeq = storedBetweenConsts.foldRight(newConstantSeq) (_ :: _)
+          newConstantSeq = storedBigConsts.foldRight(newConstantSeq) (_ :: _)
 
           val o = newConstantSeq.size
           new TermOrder(newConstantSeq, predicateSeq,
@@ -624,7 +624,7 @@ class TermOrder private (
   def extendPred(newPreds : Seq[Predicate]) : TermOrder = {
     val o = predicateWeight.size
     new TermOrder(constantSeq,
-                  (predicateSeq /: newPreds) { case (l, p) => p :: l },
+                  newPreds.foldLeft(predicateSeq) { case (l, p) => p :: l },
                   constantWeight, constantNum,
                   predicateWeight ++ (
                     for ((p, i) <- newPreds.iterator.zipWithIndex) yield (
@@ -642,7 +642,7 @@ class TermOrder private (
         val sortedConsts =
           sort(for (c <- consts.iterator;
                     if (constantNum contains c)) yield c)
-        (List[ConstantTerm]() /: sortedConsts) { case (l, c) => c :: l }
+        sortedConsts.foldLeft(List[ConstantTerm]()) { case (l, c) => c :: l }
       } else {
         // for many remaining constants, just filter the old sequence
         constantSeq filter consts

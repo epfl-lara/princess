@@ -145,7 +145,7 @@ class TriggerGenerator(consideredFunctions : Set[IFunction],
         Set() ++ (for ((_, s, _) <- subTriggers.iterator; v <- s.iterator) yield v)
 
       // the number of subterms that contain variables
-      lazy val subTermVarNum = (0 /: subres) {
+      lazy val subTermVarNum = subres.foldLeft(0) {
         case (n, (_, _, vars)) if (!vars.isEmpty) => n + 1
         case (n, _) => n
       }
@@ -371,7 +371,7 @@ class TriggerGenerator(consideredFunctions : Set[IFunction],
         }
       
       def addCoveredVars(coveredVars : Map[Int, Int], vars : Iterator[Int]) =
-        (coveredVars /: vars) {
+        vars.foldLeft(coveredVars) {
            case (cv, v) => (cv get v) match {
              case Some(num) => cv + (v -> (num + 1))
              case None => cv
@@ -412,7 +412,7 @@ class TriggerGenerator(consideredFunctions : Set[IFunction],
             multiTriggers ++ List(List())
               
 //          println(chosenTriggers.toList)
-          (newFor /: chosenTriggers) { case (f, t) => ITrigger(t, f) }
+          chosenTriggers.foldLeft(newFor) { case (f, t) => ITrigger(t, f) }
         }
 
         case TriggerStrategy.AllUni => {
@@ -426,14 +426,14 @@ class TriggerGenerator(consideredFunctions : Set[IFunction],
               multiTriggers
               
 //          println(chosenTriggers)
-          (newFor /: chosenTriggers) { case (f, t) => ITrigger(t, f) }
+          chosenTriggers.foldLeft(newFor) { case (f, t) => ITrigger(t, f) }
         }
 
         case _ => { // AllMaximal or AllMinimal
           val chosenTriggers : Seq[List[ITerm]] = multiTriggers
               
 //          println(chosenTriggers.toList)
-          (newFor /: chosenTriggers) { case (f, t) => ITrigger(t, f) }
+          chosenTriggers.foldLeft(newFor) { case (f, t) => ITrigger(t, f) }
         }
       }
     }

@@ -97,7 +97,7 @@ abstract class Certificate {
   val localBoundConstants : Set[ConstantTerm] = Set()
 
   lazy val inferenceCount : Int =
-    (1 /: this.subCertificates) {
+    this.subCertificates.foldLeft(1) {
       case (num, cert) => num + cert.inferenceCount
     }
 

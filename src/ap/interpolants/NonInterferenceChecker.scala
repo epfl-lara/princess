@@ -551,7 +551,7 @@ class NonInterferenceChecker2(progCtor : FrameworkVocabulary =>
         val prover =
           validityCheckProver.assert(toInternal(invariants.last, sig) _1, order)
         val prover2 =
-          (prover /: (invariants.view take (invariants.size - 1))) {
+          (invariants.view take (invariants.size - 1)).foldLeft(prover) {
             case (p, i) => p.conclude(toInternal(i, sig) _1, order)
           }
 
@@ -863,7 +863,7 @@ class NonInterferenceChecker(progCtor : FrameworkVocabulary => ConcurrentProgram
         val prover =
           validityCheckProver.assert(toInternal(invariants.last, sig) _1, order)
         val prover2 =
-          (prover /: (invariants.view take (invariants.size - 1))) {
+          (invariants.view take (invariants.size - 1)).foldLeft(prover) {
             case (p, i) => p.conclude(toInternal(i, sig) _1, order)
           }
 

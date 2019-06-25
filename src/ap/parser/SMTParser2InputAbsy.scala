@@ -41,6 +41,7 @@ import ap.util.{Debug, Logic, PlainRange}
 
 import scala.collection.mutable.{ArrayBuffer,
                                  HashMap => MHashMap, HashSet => MHashSet}
+import scala.collection.JavaConverters._
 
 object SMTParser2InputAbsy {
 
@@ -320,7 +321,6 @@ object SMTParser2InputAbsy {
 
   /** Implicit conversion so that we can get a Scala-like iterator from a
    * a Java list */
-  import scala.collection.JavaConversions.{asScalaBuffer, asScalaIterator}
 
   def asString(s : SymbolRef) : String = s match {
     case s : IdentifierRef     => asString(s.identifier_)
@@ -332,7 +332,7 @@ object SMTParser2InputAbsy {
       asString(id.symbol_)
     case id : IndexIdent =>
       asString(id.symbol_) + "_" +
-      ((id.listindexc_ map (_.asInstanceOf[Index].numeral_)) mkString "_")
+      ((id.listindexc_.asScala map (_.asInstanceOf[Index].numeral_)) mkString "_")
   }
   
   def asString(s : Symbol) : String = s match {
@@ -373,7 +373,7 @@ object SMTParser2InputAbsy {
       case id : IndexIdent => id.symbol_ match {
         case s : NormalSymbol =>
           Some(List(s.normalsymbolt_) ++
-               (id.listindexc_ map (_.asInstanceOf[Index].numeral_)))
+               (id.listindexc_.asScala map (_.asInstanceOf[Index].numeral_)))
         case _ => None
       }
       case _ => None
@@ -458,7 +458,6 @@ class SMTParser2InputAbsy (_env : Environment[SMTParser2InputAbsy.SMTType,
   
   /** Implicit conversion so that we can get a Scala-like iterator from a
     * a Java list */
-  import scala.collection.JavaConversions.{asScalaBuffer, asScalaIterator}
 
   type GrammarExpression = Term
 
@@ -572,7 +571,7 @@ class SMTParser2InputAbsy (_env : Environment[SMTParser2InputAbsy.SMTType,
       parseTree match {
         case script : Script
           if (script.listcommand_.size == 1) =>
-            script.listcommand_.head match {
+            script.listcommand_.asScala.head match {
               case cmd : IgnoreCommand => cmd.term_
               case _ =>
                 throw new ParseException(
@@ -1072,7 +1071,7 @@ class SMTParser2InputAbsy (_env : Environment[SMTParser2InputAbsy.SMTType,
         val name = asString(cmd.symbol_)
         val sortNames = List(name)
         val (adtCtors, smtCtorArgs) =
-          translateDataCtorList(sortNames, 0, cmd.listconstructordeclc_)
+          translateDataCtorList(sortNames, 0, cmd.listconstructordeclc_.asScala)
 
         setupADT(sortNames, List((adtCtors, smtCtorArgs)))
 
@@ -1095,7 +1094,7 @@ class SMTParser2InputAbsy (_env : Environment[SMTParser2InputAbsy.SMTType,
 
         val allCtors =
           for ((maybedecl, sortNum) <-
-                 cmd.listmaybepardatadecl_.zipWithIndex) yield {
+                 cmd.listmaybepardatadecl_.asScala.zipWithIndex) yield {
             val decl = maybedecl match {
               case d : MonoDataDecl => d
               case _ : ParDataDecl =>
@@ -1103,7 +1102,7 @@ class SMTParser2InputAbsy (_env : Environment[SMTParser2InputAbsy.SMTType,
                   "Polymorphic algebraic data-types are not supported yet")
             }
             translateDataCtorList(sortNames, sortNum,
-                                  decl.listconstructordeclc_)  
+                                  decl.listconstructordeclc_.asScala)  
           }
 
         setupADT(sortNames, allCtors)
@@ -1127,10 +1126,10 @@ class SMTParser2InputAbsy (_env : Environment[SMTParser2InputAbsy.SMTType,
           }
 
         val allCtors =
-          for ((declc, sortNum) <- cmd.listolddatadeclc_.zipWithIndex) yield {
+          for ((declc, sortNum) <- cmd.listolddatadeclc_.asScala.zipWithIndex) yield {
             val decl = declc.asInstanceOf[OldDataDecl]
             translateDataCtorList(sortNames, sortNum,
-                                  decl.listconstructordeclc_)
+                                  decl.listconstructordeclc_.asScala)
           }
 
         setupADT(sortNames, allCtors)
@@ -1369,7 +1368,7 @@ class SMTParser2InputAbsy (_env : Environment[SMTParser2InputAbsy.SMTType,
         // parse bodies
         val funDefs =
           for (((sigc, bodyExpr), f) <-
-                 (cmd.listfunsignaturec_ zip cmd.listterm_) zip functions) yield {
+                 (cmd.listfunsignaturec_.asScala zip cmd.listterm_.asScala) zip functions) yield {
             val sig = sigc.asInstanceOf[FunSignature]
             val argNum = pushVariables(sig.listesortedvarc_)
             val resType = translateSort(sig.sort_)
@@ -1490,7 +1489,7 @@ class SMTParser2InputAbsy (_env : Environment[SMTParser2InputAbsy.SMTType,
           case SimpleAPI.ProverStatus.Sat |
                SimpleAPI.ProverStatus.Invalid |
                SimpleAPI.ProverStatus.Inconclusive => try {
-            val expressions = cmd.listterm_.toList
+            val expressions = cmd.listterm_.asScala.toList
 
             val values = prover.withTimeout(timeoutPer) {
               for (expr <- expressions) yield
@@ -1775,7 +1774,7 @@ class SMTParser2InputAbsy (_env : Environment[SMTParser2InputAbsy.SMTType,
     case s : CompositeSort => asString(s.identifier_) match {
       case "Array" => {
         val args =
-          for (t <- s.listsort_.toList) yield translateSort(t)
+          for (t <- s.listsort_.asScala.toList) yield translateSort(t)
         if (args.size < 2)
           throw new Parser2InputAbsy.TranslationException(
             "Expected at least two sort arguments in " + (printer print s))
@@ -1798,7 +1797,7 @@ class SMTParser2InputAbsy (_env : Environment[SMTParser2InputAbsy.SMTType,
     case t : NullaryTerm =>
       symApp(t.symbolref_, List(), polarity)
     case t : FunctionTerm =>
-      symApp(t.symbolref_, t.listterm_, polarity)
+      symApp(t.symbolref_, t.listterm_.asScala, polarity)
 
     case t : QuantifierTerm =>
       translateQuantifier(t, polarity)
@@ -1810,7 +1809,7 @@ class SMTParser2InputAbsy (_env : Environment[SMTParser2InputAbsy.SMTType,
         a.attrparam_ match {
           case p : SomeAttrParam => p.sexpr_ match {
             case e : ParenSExpr => 
-              for (expr <- e.listsexpr_.toList;
+              for (expr <- e.listsexpr_.asScala.toList;
                    transTriggers = {
                      try { List(translateTrigger(expr)) }
                      catch { case _ : TranslationException |
@@ -1853,7 +1852,7 @@ class SMTParser2InputAbsy (_env : Environment[SMTParser2InputAbsy.SMTType,
           
           translateTerm(t.term_, polarity) match {
             case p@(expr, SMTBool) =>
-              ((asFormula(p) /: names) {
+              (names.foldLeft(asFormula(p)) {
                  case (res, name) => INamedPart(env lookupPartName name, res)
                }, SMTBool)
             case p =>
@@ -1867,7 +1866,7 @@ class SMTParser2InputAbsy (_env : Environment[SMTParser2InputAbsy.SMTType,
       if (triggers.isEmpty)
         baseExpr
       else
-        ((asFormula(baseExpr) /: triggers) {
+        (triggers.foldLeft(asFormula(baseExpr)) {
            case (res, trigger) => ITrigger(ITrigger.extractTerms(trigger), res)
          }, SMTBool)
     }
@@ -2967,7 +2966,7 @@ class SMTParser2InputAbsy (_env : Environment[SMTParser2InputAbsy.SMTType,
         throw new Parser2InputAbsy.TranslationException(
           "Expected a function application, not " + (printer print expr))
       
-      expr.listsexpr_.head match {
+      expr.listsexpr_.asScala.head match {
         case funExpr : SymbolSExpr => asString(funExpr.symbol_) match {
           case "select" =>
             IFunApp(SimpleArray(expr.listsexpr_.size - 2).select,
@@ -2979,22 +2978,22 @@ class SMTParser2InputAbsy (_env : Environment[SMTParser2InputAbsy.SMTType,
           case funName => lookupSym(funName) match {
             case Environment.Function(fun, _) => {
               checkArgNumSExpr(printer print funExpr.symbol_, fun.arity,
-                               expr.listsexpr_.tail)
+                               expr.listsexpr_.asScala.tail)
               IFunApp(fun, translateSExprTail(expr.listsexpr_))
             }
             case Environment.Predicate(pred, _, _) => {
               checkArgNumSExpr(printer print funExpr.symbol_, pred.arity,
-                               expr.listsexpr_.tail)
+                               expr.listsexpr_.asScala.tail)
               IAtom(pred, translateSExprTail(expr.listsexpr_))
             }
             case Environment.Constant(c, _, _) => {
               checkArgNumSExpr(printer print funExpr.symbol_,
-                               0, expr.listsexpr_.tail)
+                               0, expr.listsexpr_.asScala.tail)
               c
             }
             case Environment.Variable(i, BoundVariable(t)) if (t != SMTBool) => {
               checkArgNumSExpr(printer print funExpr.symbol_,
-                               0, expr.listsexpr_.tail)
+                               0, expr.listsexpr_.asScala.tail)
               v(i)
             }
             case _ =>
@@ -3008,7 +3007,7 @@ class SMTParser2InputAbsy (_env : Environment[SMTParser2InputAbsy.SMTType,
   }
   
   private def translateSExprTail(exprs : ListSExpr) : Seq[ITerm] = {
-    val args = exprs.tail.toList
+    val args = exprs.asScala.tail.toList
     for (e <- args) yield translateTrigger(e) match {
       case ta : ITerm => ta
       case ta : IFormula => ITermITE(ta, i(0), i(1))
@@ -3029,7 +3028,7 @@ class SMTParser2InputAbsy (_env : Environment[SMTParser2InputAbsy.SMTType,
                     result))
       case p : ParenSExpr
         if (!p.listsexpr_.isEmpty &&
-            (printer print p.listsexpr_.head) == "and") => {
+            (printer print p.listsexpr_.asScala.head) == "and") => {
         val it = p.listsexpr_.iterator
         it.next
         val names = (for (s <- it) yield partNameIndexes(
@@ -3078,7 +3077,7 @@ class SMTParser2InputAbsy (_env : Environment[SMTParser2InputAbsy.SMTType,
           c.smtstring_.substring(1, c.smtstring_.size - 1)
                       .iterator.map(_.toInt))
 
-      ((escSeq :\ stringTheory.str_empty()) {
+      (escSeq.foldRight(stringTheory.str_empty()) {
          case (c, s) => stringTheory.str_cons(stringTheory int2Char c, s)
        }, stringType)
     }
@@ -3125,7 +3124,7 @@ class SMTParser2InputAbsy (_env : Environment[SMTParser2InputAbsy.SMTType,
   private object SMTConnective extends ASTConnective {
     def unapplySeq(t : Term) : scala.Option[Seq[Term]] = t match {
       case t : NullaryTerm => Some(List())
-      case t : FunctionTerm => Some(t.listterm_.toList)
+      case t : FunctionTerm => Some(t.listterm_.asScala.toList)
     }
   }
 

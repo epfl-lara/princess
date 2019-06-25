@@ -75,7 +75,7 @@ class MultiSet[A] private (private val multiplicities : Map[A, Int])
   
   def contains(key : A) : Boolean = multiplicities contains key
   
-  lazy val size : Int = (0 /: multiplicities) ((res, n) => res + (n _2))
+  lazy val size : Int = multiplicities.foldLeft(0) ((res, n) => res + (n _2))
 
   lazy val supp : scala.collection.Set[A] = multiplicities.keySet
   
@@ -95,7 +95,7 @@ class MultiSet[A] private (private val multiplicities : Map[A, Int])
   def +(el : A) : MultiSet[A] = this.+(el, 1)
 
   def ++(els : Iterator[(A, Int)]) : MultiSet[A] =
-    updateMultiplicities((multiplicities /: els) ((m, el) =>
+    updateMultiplicities(els.foldLeft(multiplicities) ((m, el) =>
                                 MultiSet.addMultiplicity(m, el)))
 
   def ++(els : Iterable[(A, Int)]) : MultiSet[A] =
@@ -116,7 +116,7 @@ class MultiSet[A] private (private val multiplicities : Map[A, Int])
     updateMultiplicities(MultiSet.removeMultiplicity(multiplicities, el))
 
   def --(els : Iterator[(A, Int)]) : MultiSet[A] =
-    updateMultiplicities((multiplicities /: els) ((m, el) =>
+    updateMultiplicities(els.foldLeft(multiplicities) ((m, el) =>
                                 MultiSet.addMultiplicity(m, el)))
 
   def --(els : Iterable[(A, Int)]) : MultiSet[A] = --(els.iterator)

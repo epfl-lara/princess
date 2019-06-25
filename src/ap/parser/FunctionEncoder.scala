@@ -533,7 +533,7 @@ class FunctionEncoder (tightFunctionScopes : Boolean,
     private def addDefPredicates(f : IFormula,
                                  universal : Boolean,
                                  abstractions : Iterator[(IFunApp, Int, IAtom)]) =
-      (f /: abstractions) {
+      abstractions.foldLeft(f) {
         case (f, (_, _, defAtom)) =>
           if (universal) defAtom ==> f else defAtom & f 
       }

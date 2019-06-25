@@ -39,7 +39,7 @@ object LazyConjunction {
     
   def conj(formulas : Iterator[LazyConjunction])
           (implicit order : TermOrder) : LazyConjunction =
-    (TRUE.asInstanceOf[LazyConjunction] /: formulas) (_ & _)
+    formulas.foldLeft(TRUE.asInstanceOf[LazyConjunction]) (_ & _)
   
   def conj(formulas : Iterable[LazyConjunction])
           (implicit order : TermOrder) : LazyConjunction =

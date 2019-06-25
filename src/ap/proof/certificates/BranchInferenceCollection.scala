@@ -164,7 +164,7 @@ class BranchInferenceCollection private (val inferences : List[BranchInference])
     LoggingBranchInferenceCollector(inferences)
 
   def ++(newInferences : Seq[BranchInference]) : BranchInferenceCollection =
-    BranchInferenceCollection((inferences /: newInferences) {
+    BranchInferenceCollection(newInferences.foldLeft(inferences) {
                                 case (infs, inf) => inf :: infs
                               })
   

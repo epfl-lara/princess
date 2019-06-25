@@ -354,7 +354,7 @@ class ReduceWithInEqsImpl protected[inequalities]
         logger.combineInequalities(coeff1, lc1, coeff2, lc2,
                                    initIneq, initIneq, order)
 
-        (initIneq /: bounds) {
+        bounds.foldLeft(initIneq) {
           case (s, (c, lc)) => {
             val newS = 
               LinearCombination.sum(Array((IdealInt.ONE, s), (c, lc)), order)

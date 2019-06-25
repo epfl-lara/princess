@@ -95,7 +95,7 @@ object Theory {
                   theories : Seq[Theory], signature : Signature)
                  : (IFormula, Signature) =
 //  ap.util.Timer.measure("theory iPreprocessing") {
-    ((f, signature) /: theories) { case ((f, s), t) => t.iPreprocess(f, s) }
+    theories.foldLeft((f, signature)) { case ((f, s), t) => t.iPreprocess(f, s) }
 //  }
 
   /**
@@ -106,7 +106,7 @@ object Theory {
                  theories : Seq[Theory],
                  order : TermOrder) : Conjunction =
 //  ap.util.Timer.measure("theory preprocessing") {
-    (f /: theories) { case (f, t) => t.preprocess(f, order) }
+    theories.foldLeft(f) { case (f, t) => t.preprocess(f, order) }
 //  }
 
   //////////////////////////////////////////////////////////////////////////////

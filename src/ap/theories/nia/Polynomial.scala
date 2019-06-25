@@ -496,7 +496,7 @@ case class Polynomial(val terms : Polynomial.TermList)
   lazy val variables : Set[ConstantTerm] =
     (for (t <- terms.iterator; c <- t.variables.iterator) yield c).toSet
 
-  lazy val order = (0 /: terms)((c, n) => c.max(n.order))
+  lazy val order = terms.foldLeft(0)((c, n) => c.max(n.order))
 
   override def toString() : String =  {
     terms match {

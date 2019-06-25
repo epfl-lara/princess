@@ -396,7 +396,7 @@ object ProofSimplifier {
     val res = new MHashSet[CertInequality]
     
     for (ind <- 0 until subCerts.size)
-      res ++= (subInEqs(ind) /: (0 until subCerts.size)) { case (ies, j) =>
+      res ++= (0 until subCerts.size).foldLeft(subInEqs(ind)) { case (ies, j) =>
         if (ind == j) ies else (ies -- ineqSubset(subCerts(j).assumedFormulas))
       }
 
@@ -495,7 +495,7 @@ object ProofSimplifier {
 
   private def mergeWeakening(a : WeakeningRange, b : WeakeningRange)
                             : WeakeningRange =
-    (a /: b) { case (newBounds, (ineq, bound)) =>
+    b.foldLeft(a) { case (newBounds, (ineq, bound)) =>
       newBounds + (ineq -> (bound min newBounds.getOrElse(ineq, bound)))
     }
 
@@ -537,8 +537,7 @@ object ProofSimplifier {
           val wkn2 =
             (wkn get leftInEq, wkn get rightInEq, wkn get result) match {
               case (None, None, Some(resultW)) =>
-                wkn - result + (leftInEq -> (resultW / leftCoeff),
-                                rightInEq -> (resultW / rightCoeff))
+                wkn - result + (leftInEq -> resultW / leftCoeff) + (rightInEq -> resultW / rightCoeff)
               case (_, _, None)                => wkn
               case _                           => defaultWeakening
             }
