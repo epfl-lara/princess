@@ -21,7 +21,6 @@
 
 package ap.basetypes;
 
-import scala.collection.IterableLike
 import scala.collection.mutable.{ArrayBuffer, ArrayStack => Stack}
 
 import ap.util.Debug

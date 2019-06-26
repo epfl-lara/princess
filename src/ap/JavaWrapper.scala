@@ -82,7 +82,7 @@ object JavaWrapper {
   def read(input : () => java.io.Reader,
            options : java.util.List[String]) : String = {
     val (settings, inputs) =
-      GlobalSettings.fromArguments(options.asScala, GlobalSettings.DEFAULT)
+      GlobalSettings.fromArguments(options.asScala.toSeq, GlobalSettings.DEFAULT)
 
     Console.withErr(if (Param.QUIET(settings))
                       CmdlMain.NullStream

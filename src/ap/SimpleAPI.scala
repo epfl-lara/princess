@@ -21,6 +21,8 @@
 
 package ap
 
+import scala.collection.compat._
+
 import ap.basetypes.{IdealInt, Tree}
 import ap.parser._
 import ap.parameters.{PreprocessingSettings, GoalSettings, ParserSettings,
@@ -3896,7 +3898,7 @@ class SimpleAPI private (enableAssert : Boolean,
     flushTodo
     initProver
     
-    storedStates push (currentProver, needExhaustiveProver,
+    storedStates push ((currentProver, needExhaustiveProver,
                        matchedTotalFunctions, ignoredQuantifiers,
                        currentOrder, existentialConstants,
                        functionalPreds, functionEnc.clone,
@@ -3906,7 +3908,7 @@ class SimpleAPI private (enableAssert : Boolean,
                        validityMode, lastStatus,
                        theoryPlugin, theoryCollector.clone,
                        abbrevFunctions,
-                       abbrevPredicates)
+                       abbrevPredicates))
   }
 
   /**
@@ -4294,7 +4296,7 @@ class SimpleAPI private (enableAssert : Boolean,
         }
     })
 
-    gs = Param.ABBREV_LABELS.set(gs, abbrevPredicates mapValues (_._2))
+    gs = Param.ABBREV_LABELS.set(gs, abbrevPredicates.view.mapValues(_._2).toMap)
 
     gs = Param.PROOF_CONSTRUCTION.set(gs, constructProofs)
     // currently done for all predicates encoding functions; should this be

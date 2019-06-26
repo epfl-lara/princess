@@ -309,7 +309,7 @@ class IntelliFileProver(reader : java.io.Reader,
                            Param.REDUCER_SETTINGS(goalSettings))
             toIFormula(rawInterpolant)
           }
-          NoCounterModelCertInter(cert, interpolants)
+          NoCounterModelCertInter(cert, interpolants.toSeq)
         }
 
         case Right(cert) => {

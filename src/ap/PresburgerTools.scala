@@ -850,7 +850,7 @@ object PresburgerTools {
 
           case _ => {
             val tailVals =
-              for (lc <- nextTerms) yield eval(lc.view(1, lc.size))
+              for (lc <- nextTerms) yield eval(lc.view(1, lc.size).toSeq)
 
             var constV =
               (for ((lc, tailVal) <- nextTerms.iterator zip tailVals.iterator;

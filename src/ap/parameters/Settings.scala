@@ -312,12 +312,7 @@ abstract class Settings[STT <: Settings[STT]]
     Debug.assertPre(Settings.AC, allParams contains p)
     //-END-ASSERTION-/////////////////////////////////////////////////////////
     (paramMap get p) match {
-      case Some(value : Any) => {
-        //-BEGIN-ASSERTION-///////////////////////////////////////////////////////
-        Debug.assertPost(Settings.AC, value.isInstanceOf[p.Value])
-        //-END-ASSERTION-/////////////////////////////////////////////////////////
-        value
-      }
+      case Some(value : Any) => value
       case None => p.defau
     }
   }
@@ -325,8 +320,7 @@ abstract class Settings[STT <: Settings[STT]]
   protected[parameters] def +(paramPair : (Param, Any)) : STT = {
     val (p, value) = paramPair
     //-BEGIN-ASSERTION-///////////////////////////////////////////////////////
-    Debug.assertPre(Settings.AC, (allParams contains p) &&
-                                 value.isInstanceOf[p.Value])
+    Debug.assertPre(Settings.AC, allParams contains p)
     //-END-ASSERTION-///////////////////////////////////////////////////////////
     setParams(paramMap + paramPair)
   }

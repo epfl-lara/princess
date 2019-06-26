@@ -151,7 +151,7 @@ class ApParser2InputAbsy(_env : ApParser2InputAbsy.Env,
   protected def translateInterpolantSpecs(api : API)
                                          : List[IInterpolantSpec] = api match {
     case api : BlockList => {
-      (for (block <- api.listblock_;
+      (for (block <- api.listblock_.asScala;
             if block.isInstanceOf[Interpolant];
             inter = block.asInstanceOf[Interpolant];
             intBlocks = inter.listinterpblockc_;
@@ -159,9 +159,9 @@ class ApParser2InputAbsy(_env : ApParser2InputAbsy.Env,
          val left = intBlocks.asScala take n
          val right = intBlocks.asScala drop n
          IInterpolantSpec(
-           (for (ids <- left; id <- ids.asInstanceOf[InterpBlock].listident_)
+           (for (ids <- left; id <- ids.asInstanceOf[InterpBlock].listident_.asScala)
               yield (env lookupPartName id)).toList,
-           (for (ids <- right; id <- ids.asInstanceOf[InterpBlock].listident_)
+           (for (ids <- right; id <- ids.asInstanceOf[InterpBlock].listident_.asScala)
               yield (env lookupPartName id)).toList)
        }).toList
     }
@@ -173,9 +173,9 @@ class ApParser2InputAbsy(_env : ApParser2InputAbsy.Env,
     case api : BlockList => {
 
       // declare uninterpreted sorts
-      for (block <- api.listblock_.iterator) block match {
+      for (block <- api.listblock_.asScala.iterator) block match {
         case block : SortDecls =>
-          for (decl <- block.listdeclsortc_.iterator) decl match {
+          for (decl <- block.listdeclsortc_.asScala.iterator) decl match {
             case decl : DeclUnintSort => {
               val name = decl.ident_
               warn("treating sort " + name + " as infinite sort")
@@ -189,9 +189,9 @@ class ApParser2InputAbsy(_env : ApParser2InputAbsy.Env,
       // determine all declared ADTs
       val adtNames = new ArrayBuffer[String]
 
-      for (block <- api.listblock_.iterator) block match {
+      for (block <- api.listblock_.asScala.iterator) block match {
         case block : SortDecls =>
-          for (decl <- block.listdeclsortc_.iterator) decl match {
+          for (decl <- block.listdeclsortc_.asScala.iterator) decl match {
             case decl : DeclADT =>
               adtNames += decl.ident_
             case _ => // nothing
@@ -202,13 +202,13 @@ class ApParser2InputAbsy(_env : ApParser2InputAbsy.Env,
       // then translate ADT constructors
       val ctors = new ArrayBuffer[(String, ADT.CtorSignature)]
 
-      for (block <- api.listblock_.iterator) block match {
+      for (block <- api.listblock_.asScala.iterator) block match {
         case block : SortDecls =>
-          for (decl <- block.listdeclsortc_.iterator) decl match {
+          for (decl <- block.listdeclsortc_.asScala.iterator) decl match {
             case decl : DeclADT => {
               val adtSort = ADT.ADTSort(adtNames indexOf decl.ident_)
 
-              for (ctorC <- decl.listdeclctorc_.iterator) {
+              for (ctorC <- decl.listdeclctorc_.asScala.iterator) {
                 val ctor = ctorC.asInstanceOf[DeclCtor]
 
                 val ctorName = ctor.ident_
@@ -217,8 +217,8 @@ class ApParser2InputAbsy(_env : ApParser2InputAbsy.Env,
                   case _ : NoFormalArgs =>
                     List()
                   case args : WithFormalArgs =>
-                    for (arg <- args.formalargsc_.asInstanceOf[FormalArgs]
-                                    .listargtypec_) yield arg match {
+                    for (arg <- args.formalargsc_.asInstanceOf[FormalArgs].listargtypec_.asScala)
+                    yield arg match {
                       case arg : ArgType =>
                         throw new Parser2InputAbsy.TranslationException(
                           "Construct " + ctorName +
@@ -273,27 +273,27 @@ class ApParser2InputAbsy(_env : ApParser2InputAbsy.Env,
 
   protected def collectDeclarations(api : API) : Unit = api match {
     case api : BlockList =>
-      for (block <- api.listblock_.iterator) block match {
+      for (block <- api.listblock_.asScala.iterator) block match {
         case block : FunctionDecls =>
-          for (decl <- block.listdeclfunc_.iterator)
+          for (decl <- block.listdeclfunc_.asScala.iterator)
             collectDeclFunC(decl,
               (id, sort) => env.addConstant(toMVBool(sort) newConstant id,
                                             Environment.NullaryFunction,
                                             ()))
         case block : ExConstants =>
-          for (decl <- block.listdeclconstantc_.iterator)
+          for (decl <- block.listdeclconstantc_.asScala.iterator)
             collectDeclConstantC(decl,
               (id, sort) => env.addConstant(toMVBool(sort) newConstant id,
                                             Environment.Existential,
                                             ()))
         case block : UniConstants =>
-          for (decl <- block.listdeclconstantc_.iterator)
+          for (decl <- block.listdeclconstantc_.asScala.iterator)
             collectDeclConstantC(decl,
               (id, sort) => env.addConstant(toMVBool(sort) newConstant id,
                                             Environment.Universal,
                                             ()))
         case block : PredDecls =>
-          for (decl <- block.listdeclpredc_.iterator) decl match {
+          for (decl <- block.listdeclpredc_.asScala.iterator) decl match {
             case decl : DeclPred => {
               val name = decl.ident_
               val argSorts : Seq[Sort] = decl.optformalargs_ match {
@@ -378,7 +378,7 @@ class ApParser2InputAbsy(_env : ApParser2InputAbsy.Env,
 
   private def determineSorts(args : FormalArgsC) : Seq[Sort] = args match {
     case args : FormalArgs =>
-      for (at <- args.listargtypec_) yield at match {
+      for (at <- args.listargtypec_.asScala) yield at match {
         case at : ArgType      => type2Sort(at.type_)
         case at : NamedArgType => type2Sort(at.type_)
       }
@@ -403,7 +403,7 @@ class ApParser2InputAbsy(_env : ApParser2InputAbsy.Env,
     case decl : DeclBinder1 =>
       collectVarDeclarations(decl.declvarc_, addCmd)
     case decl : DeclBinderM =>
-      for (decl <- decl.listdeclvarc_.iterator) 
+      for (decl <- decl.listdeclvarc_.asScala.iterator) 
                                  collectVarDeclarations(decl, addCmd)
   }
   
@@ -411,7 +411,7 @@ class ApParser2InputAbsy(_env : ApParser2InputAbsy.Env,
                                      addCmd : (String, Sort) => Unit) : Unit = decl match {
     case decl : DeclVar => {
       val sort = type2Sort(decl.type_)
-      for (id <- decl.listident_.iterator) addCmd(id, sort)
+      for (id <- decl.listident_.asScala.iterator) addCmd(id, sort)
     }
   }
 
@@ -420,7 +420,7 @@ class ApParser2InputAbsy(_env : ApParser2InputAbsy.Env,
     decl match {
       case decl : DeclConst => {
         val sort = type2Sort(decl.type_)
-        for (id <- decl.listident_.iterator) addCmd(id, sort)
+        for (id <- decl.listident_.asScala.iterator) addCmd(id, sort)
       }
     }
 
@@ -488,9 +488,9 @@ class ApParser2InputAbsy(_env : ApParser2InputAbsy.Env,
 
   private def collectFunPredDefs(api : API) : Unit = api match {
     case api : BlockList =>
-      for (block <- api.listblock_.iterator) block match {
+      for (block <- api.listblock_.asScala.iterator) block match {
         case block : FunctionDecls =>
-          for (decl <- block.listdeclfunc_.iterator) decl match {
+          for (decl <- block.listdeclfunc_.asScala.iterator) decl match {
             case decl : DeclFun if (decl.optbody_.isInstanceOf[SomeBody]) => {
               val Environment.Function(fun, _) = env.lookupSym(decl.ident_)
               
@@ -515,7 +515,7 @@ class ApParser2InputAbsy(_env : ApParser2InputAbsy.Env,
           }
 
         case block : PredDecls =>
-          for (decl <- block.listdeclpredc_.iterator) decl match {
+          for (decl <- block.listdeclpredc_.asScala.iterator) decl match {
             case decl : DeclPred if (decl.optbody_.isInstanceOf[SomeBody]) => {
               val Environment.Predicate(pred, _, _) = env.lookupSym(decl.ident_)
 
@@ -1151,7 +1151,7 @@ class ApParser2InputAbsy(_env : ApParser2InputAbsy.Env,
   }
   
   private def translateArgs(args : ListArgC) =
-    for (arg <- args) yield arg match {
+    for (arg <- args.asScala) yield arg match {
       case arg : Arg => translateExpression(arg.expression_)
     }
 
@@ -1171,7 +1171,7 @@ class ApParser2InputAbsy(_env : ApParser2InputAbsy.Env,
   }
   
   private def translateExprArgs(args : ListArgC) =
-    (for (arg <- args.iterator) yield arg match {
+    (for (arg <- args.asScala.iterator) yield arg match {
        case arg : Arg => translateExpression(arg.expression_)
      }).toSeq
 

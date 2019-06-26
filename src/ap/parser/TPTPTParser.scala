@@ -22,6 +22,8 @@
 
 package ap.parser
 
+import scala.collection.compat._
+
 import ap._
 import ap.parameters.{ParserSettings, Param}
 import ap.basetypes.{IdealInt, IdealRat}
@@ -352,14 +354,14 @@ class TPTPTParser(_env : Environment[TPTPTParser.Type,
       case TPTPType.TFF => connect(
         // add full axioms
         (if (containsRat)
-           generalRatAxioms("rat_", RatType, allLits mapValues (_._1)) ++
+           generalRatAxioms("rat_", RatType, allLits.view.mapValues(_._1).toMap) ++
            (for ((value, (const, _)) <- allLits; if (value.denom.isOne))
             yield (checkUnintFunTerm("int_$to_rat", List(i(value.num)), List(IntType))._1 ===
                      const))
          else
            List()) ++
         (if (containsReal)
-           generalRatAxioms("real_", RealType, allLits mapValues (_._2)) ++
+           generalRatAxioms("real_", RealType, allLits.view.mapValues(_._2).toMap) ++
            (for ((value, (_, const)) <- allLits; if (value.denom.isOne))
             yield (checkUnintFunTerm("int_$to_real", List(i(value.num)), List(IntType))._1 ===
                      const))

@@ -21,6 +21,8 @@
 
 package ap;
 
+import scala.collection.compat._
+
 import ap.proof.ConstraintSimplifier
 import ap.proof.tree.{ProofTree, QuantifiedTree}
 import ap.proof.certificates.{Certificate, DotLineariser,
@@ -272,9 +274,9 @@ object CmdlMain {
                       rawFormulaParts : Map[PartName, Conjunction],
                       predTranslation : Map[Predicate, IFunction],
                       format : Param.InputFormat.Value) : Unit = {
-    val formulaParts = rawFormulaParts mapValues {
+    val formulaParts = rawFormulaParts.view.mapValues {
       f => CertFormula(f.negate)
-    }
+    }.toMap
     val dagCert = DagCertificateConverter(cert)
 
     val formulaPrinter = format match {

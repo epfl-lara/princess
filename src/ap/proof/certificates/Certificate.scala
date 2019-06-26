@@ -21,6 +21,8 @@
 
 package ap.proof.certificates
 
+import scala.collection.compat._
+
 import ap.proof.tree.RandomDataSource
 import ap.terfor.{TermOrder, SortedWithOrder, ConstantTerm}
 import ap.terfor.conjunctions.Conjunction
@@ -297,7 +299,7 @@ case class PartialCompositionCertificate(first : Seq[PartialCertificate],
       offset = newOffset
     }
 
-    second(subRes)
+    second(subRes.toSeq)
   }
 
   override def after(those : Seq[PartialCertificate]) : PartialCertificate = {
@@ -313,7 +315,7 @@ case class PartialCompositionCertificate(first : Seq[PartialCertificate],
       offset = newOffset
     }
 
-    PartialCompositionCertificate(newFirst, second)
+    PartialCompositionCertificate(newFirst.toSeq, second)
   }
 
   def bindFirst(cert : Certificate) : Either[PartialCertificate, Certificate] = {

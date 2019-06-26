@@ -12,7 +12,10 @@ lazy val commonSettings = laraPublishSettings ++ Seq(
     scalaVersion        := "2.12.8",
     crossScalaVersions  := Seq("2.12.8", "2.13.0"),
     publishTo           := Some(Resolver.file("file", new File( "/tmp/shared-repo"))),
+
     libraryDependencies += "org.scala-lang.modules" %% "scala-collection-compat" % "2.0.0",
+    scalafixDependencies in ThisBuild += "org.scala-lang.modules" %% "scala-collection-migrations" % "2.0.0",
+    scalacOptions ++= List("-Yrangepos", "-P:semanticdb:synthetics:on"),
 )
 
 // Jar files for the parsers
@@ -50,6 +53,8 @@ lazy val root = (project in file(".")).
   settings(commonSettings: _*).
 
   settings(
+    scalaSource in Compile := baseDirectory.value / "src",
+
     mainClass in Compile := Some("ap.CmdlMain"),
 
     scalacOptions in Compile ++= Seq(
@@ -65,17 +70,9 @@ lazy val root = (project in file(".")).
       case "2.13.0"  => "-opt:_"
     }}).value,
 
-    libraryDependencies +=
+    libraryDependencies ++= Seq(
       "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2",
-
-    libraryDependencies +=
       "net.sf.squirrel-sql.thirdparty-non-maven" % "java-cup" % "0.11a",
-
-    libraryDependencies +=
-      "org.scala-lang.modules" %% "scala-collection-compat" % "2.0.0",
-
-    scalafixDependencies in ThisBuild += "org.scala-lang.modules" %% "scala-collection-migrations" % "2.0.0",
-    libraryDependencies +=  "org.scala-lang.modules" %% "scala-collection-compat" % "2.0.0",
-    scalacOptions ++= List("-Yrangepos", "-P:semanticdb:synthetics:on"),
+    )
   )
 

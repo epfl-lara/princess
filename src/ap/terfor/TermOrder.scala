@@ -28,6 +28,7 @@ import preds.{Predicate, Atom}
 import ap.util.{CountIt, Logic, Seqs, Debug, FilterIt, FastImmutableMap}
 
 import scala.util.Sorting
+import scala.annotation.unchecked
 import scala.collection.mutable.ArrayBuffer
 
 /**
@@ -136,7 +137,7 @@ class TermOrder private (
    * <code>TermOrder</code>, or otherwise return the unchanged <code>x</code>
    */
   def sort[A](x : A) : A = x match {
-    case x : Sorted[A] => x sortBy this
+    case x : Sorted[A @unchecked] => x sortBy this
     case _ => x
   }
 

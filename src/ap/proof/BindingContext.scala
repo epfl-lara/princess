@@ -106,7 +106,7 @@ case class BindingContext private (// the groups of constants that are bound in 
       }
     }
     
-    res
+    res.toSeq
   }
   
   def containsMaximumConstantWith(consts : Iterable[ConstantTerm],

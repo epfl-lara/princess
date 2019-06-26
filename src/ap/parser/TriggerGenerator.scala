@@ -388,7 +388,7 @@ class TriggerGenerator(consideredFunctions : Set[IFunction],
         } catch {
           case TriggerGenerator.ENOUGH_TRIGGERS => // nothing
         }
-        resultList
+        resultList.toSeq
       }
       
       strategy match {
