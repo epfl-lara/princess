@@ -3,15 +3,16 @@ addCompilerPlugin("org.scalameta" % "semanticdb-scalac" % "4.1.12" cross CrossVe
 def laraPublishSettings = Seq(
   bintrayOrganization := Some("epfl-lara"),
   bintrayRepository   := "princess",
+  bintrayVcsUrl       := Some("git@github.com:epfl-lara/princess.git"),
+  licenses            += ("LGPL-2.1", url("https://opensource.org/licenses/LGPL-2.1")),
 )
 
 lazy val commonSettings = laraPublishSettings ++ Seq(
     name                := "Princess",
     organization        := "uuverifiers",
-    version             := "unstable-SNAPSHOT",
+    version             := "2019-06-26",
     scalaVersion        := "2.12.8",
     crossScalaVersions  := Seq("2.12.8", "2.13.0"),
-    publishTo           := Some(Resolver.file("file", new File( "/tmp/shared-repo"))),
 
     libraryDependencies += "org.scala-lang.modules" %% "scala-collection-compat" % "2.0.0",
     scalafixDependencies in ThisBuild += "org.scala-lang.modules" %% "scala-collection-migrations" % "2.0.0",

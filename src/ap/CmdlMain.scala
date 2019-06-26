@@ -274,7 +274,7 @@ object CmdlMain {
                       rawFormulaParts : Map[PartName, Conjunction],
                       predTranslation : Map[Predicate, IFunction],
                       format : Param.InputFormat.Value) : Unit = {
-    val formulaParts = rawFormulaParts.view.mapValues {
+    val formulaParts = rawFormulaParts.mapValues {
       f => CertFormula(f.negate)
     }.toMap
     val dagCert = DagCertificateConverter(cert)

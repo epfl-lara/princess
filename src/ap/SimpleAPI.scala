@@ -4296,7 +4296,7 @@ class SimpleAPI private (enableAssert : Boolean,
         }
     })
 
-    gs = Param.ABBREV_LABELS.set(gs, abbrevPredicates.view.mapValues(_._2).toMap)
+    gs = Param.ABBREV_LABELS.set(gs, abbrevPredicates.mapValues(_._2).toMap)
 
     gs = Param.PROOF_CONSTRUCTION.set(gs, constructProofs)
     // currently done for all predicates encoding functions; should this be

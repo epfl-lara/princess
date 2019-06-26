@@ -474,9 +474,9 @@ object ConstantSubstVisitor
     apply(t.asInstanceOf[IExpression], subst).asInstanceOf[IFormula]
 
   def rename(t : ITerm, subst : CMap[ConstantTerm, ConstantTerm]) : ITerm =
-    apply(t.asInstanceOf[IExpression], subst.view.mapValues(i(_)).toMap).asInstanceOf[ITerm]
+    apply(t.asInstanceOf[IExpression], subst.mapValues(i(_)).toMap).asInstanceOf[ITerm]
   def rename(t : IFormula, subst : CMap[ConstantTerm, ConstantTerm]) : IFormula =
-    apply(t.asInstanceOf[IExpression], subst.view.mapValues(i(_)).toMap).asInstanceOf[IFormula]
+    apply(t.asInstanceOf[IExpression], subst.mapValues(i(_)).toMap).asInstanceOf[IFormula]
 
   override def preVisit(t : IExpression,
                         subst : (CMap[ConstantTerm, ITerm], Int)) : PreVisitResult =
