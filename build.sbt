@@ -1,3 +1,5 @@
+addCompilerPlugin("org.scalameta" % "semanticdb-scalac" % "4.1.12" cross CrossVersion.full)
+
 def laraPublishSettings = Seq(
   bintrayOrganization := Some("epfl-lara"),
   bintrayRepository   := "princess",
@@ -48,13 +50,14 @@ lazy val root = (project in file(".")).
   settings(commonSettings: _*).
 
   settings(
-    scalaSource in Compile := baseDirectory.value / "src",
-
     mainClass in Compile := Some("ap.CmdlMain"),
 
-    scalacOptions in Compile ++=
-      List("-feature",
-           "-language:implicitConversions,postfixOps,reflectiveCalls"),
+    scalacOptions in Compile ++= Seq(
+      "-feature",
+      "-language:implicitConversions",
+      "-language:postfixOps",
+      "-language:reflectiveCalls"
+    ),
 
     scalacOptions += (scalaVersion map { sv => sv match {
       case "2.11.12" => "-optimise"
@@ -70,5 +73,9 @@ lazy val root = (project in file(".")).
 
     libraryDependencies +=
       "org.scala-lang.modules" %% "scala-collection-compat" % "2.0.0",
+
+    scalafixDependencies in ThisBuild += "org.scala-lang.modules" %% "scala-collection-migrations" % "2.0.0",
+    libraryDependencies +=  "org.scala-lang.modules" %% "scala-collection-compat" % "2.0.0",
+    scalacOptions ++= List("-Yrangepos", "-P:semanticdb:synthetics:on"),
   )
 
